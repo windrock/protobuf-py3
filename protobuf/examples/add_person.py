@@ -7,22 +7,22 @@ import sys
 
 # This function fills in a Person message based on user input.
 def PromptForAddress(person):
-  person.id = int(input("Enter person ID number: "))
-  person.name = input("Enter name: ")
+  person.id = int(raw_input("Enter person ID number: "))
+  person.name = raw_input("Enter name: ")
 
-  email = input("Enter email address (blank for none): ")
+  email = raw_input("Enter email address (blank for none): ")
   if email != "":
     person.email = email
 
   while True:
-    number = input("Enter a phone number (or leave blank to finish): ")
+    number = raw_input("Enter a phone number (or leave blank to finish): ")
     if number == "":
       break
 
     phone_number = person.phone.add()
     phone_number.number = number
 
-    type = input("Is this a mobile, home, or work phone? ")
+    type = raw_input("Is this a mobile, home, or work phone? ")
     if type == "mobile":
       phone_number.type = addressbook_pb2.Person.MOBILE
     elif type == "home":
@@ -30,13 +30,13 @@ def PromptForAddress(person):
     elif type == "work":
       phone_number.type = addressbook_pb2.Person.WORK
     else:
-      print("Unknown phone type; leaving as default value.")
+      print "Unknown phone type; leaving as default value."
 
 # Main procedure:  Reads the entire address book from a file,
 #   adds one person based on user input, then writes it back out to the same
 #   file.
 if len(sys.argv) != 2:
-  print("Usage:", sys.argv[0], "ADDRESS_BOOK_FILE")
+  print "Usage:", sys.argv[0], "ADDRESS_BOOK_FILE"
   sys.exit(-1)
 
 address_book = addressbook_pb2.AddressBook()
@@ -47,7 +47,7 @@ try:
   address_book.ParseFromString(f.read())
   f.close()
 except IOError:
-  print(sys.argv[1] + ": File not found.  Creating a new file.")
+  print sys.argv[1] + ": File not found.  Creating a new file."
 
 # Add an address.
 PromptForAddress(address_book.person.add())

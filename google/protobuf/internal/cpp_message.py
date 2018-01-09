@@ -1,6 +1,6 @@
 # Protocol Buffers - Google's data interchange format
 # Copyright 2008 Google Inc.  All rights reserved.
-# http://code.google.com/p/protobuf/
+# https://developers.google.com/protocol-buffers/
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -34,12 +34,11 @@ Descriptor objects at runtime backed by the protocol buffer C++ API.
 
 __author__ = 'petar@google.com (Petar Petrov)'
 
-import copyreg
+import copy_reg
 import operator
 from google.protobuf.internal import _net_proto2___python
 from google.protobuf.internal import enum_type_wrapper
 from google.protobuf import message
-import collections
 
 
 _LABEL_REPEATED = _net_proto2___python.LABEL_REPEATED
@@ -147,7 +146,7 @@ class RepeatedScalarContainer(object):
   def __eq__(self, other):
     if self is other:
       return True
-    if not isinstance(other, collections.Sequence):
+    if not operator.isSequenceType(other):
       raise TypeError(
           'Can only compare repeated scalar fields against sequences.')
     # We are presumably comparing against some other sequence type.
@@ -260,7 +259,7 @@ class RepeatedCompositeContainer(object):
       index_key = lambda i: key(self[i])
 
     # Sort the list of current indexes by the underlying object.
-    indexes = list(range(len(self)))
+    indexes = range(len(self))
     indexes.sort(cmp=cmp, key=index_key, reverse=reverse)
 
     # Apply the transposition.
@@ -386,7 +385,7 @@ def InitMessage(message_descriptor, cls):
   _AddInitMethod(message_descriptor, cls)
   _AddMessageMethods(message_descriptor, cls)
   _AddPropertiesForExtensions(message_descriptor, cls)
-  copyreg.pickle(cls, lambda obj: (cls, (), obj.__getstate__()))
+  copy_reg.pickle(cls, lambda obj: (cls, (), obj.__getstate__()))
 
 
 def _AddDescriptors(message_descriptor, dictionary):
@@ -401,7 +400,7 @@ def _AddDescriptors(message_descriptor, dictionary):
     dictionary['__descriptors'][field.name] = GetFieldDescriptor(
         field.full_name)
 
-  dictionary['__slots__'] = list(dictionary['__descriptors'].keys()) + [
+  dictionary['__slots__'] = list(dictionary['__descriptors'].iterkeys()) + [
       '_cmsg', '_owner', '_composite_fields', 'Extensions', '_HACK_REFCOUNTS']
 
 
@@ -421,7 +420,7 @@ def _AddEnumValues(message_descriptor, dictionary):
 def _AddClassAttributesForNestedExtensions(message_descriptor, dictionary):
   """Adds class attributes for the nested extensions."""
   extension_dict = message_descriptor.extensions_by_name
-  for extension_name, extension_field in extension_dict.items():
+  for extension_name, extension_field in extension_dict.iteritems():
     assert extension_name not in dictionary
     dictionary[extension_name] = extension_field
 
@@ -475,7 +474,7 @@ def _AddInitMethod(message_descriptor, cls):
       self._HACK_REFCOUNTS = self
     self._composite_fields = {}
 
-    for field_name, field_value in kwargs.items():
+    for field_name, field_value in kwargs.iteritems():
       field_cdescriptor = self.__descriptors.get(field_name, None)
       if not field_cdescriptor:
         raise ValueError('Protocol message has no "%s" field.' % field_name)
@@ -539,7 +538,7 @@ def _AddMessageMethods(message_descriptor, cls):
 
   def Clear(self):
     cmessages_to_release = []
-    for field_name, child_field in self._composite_fields.items():
+    for field_name, child_field in self._composite_fields.iteritems():
       child_cdescriptor = self.__descriptors[field_name]
       # TODO(anuraag): Support clearing repeated message fields as well.
       if (child_cdescriptor.label != _LABEL_REPEATED and
@@ -611,7 +610,7 @@ def _AddMessageMethods(message_descriptor, cls):
     return self._cmsg.FindInitializationErrors()
 
   def __str__(self):
-    return self._cmsg.DebugString()
+    return str(self._cmsg)
 
   def __eq__(self, other):
     if self is other:
@@ -632,7 +631,7 @@ def _AddMessageMethods(message_descriptor, cls):
     return text_format.MessageToString(self, as_utf8=True).decode('utf-8')
 
   # Attach the local methods to the message class.
-  for key, value in locals().copy().items():
+  for key, value in locals().copy().iteritems():
     if key not in ('key', 'value', '__builtins__', '__name__', '__doc__'):
       setattr(cls, key, value)
 
@@ -659,6 +658,6 @@ def _AddMessageMethods(message_descriptor, cls):
 def _AddPropertiesForExtensions(message_descriptor, cls):
   """Adds properties for all fields in this protocol message type."""
   extension_dict = message_descriptor.extensions_by_name
-  for extension_name, extension_field in extension_dict.items():
+  for extension_name, extension_field in extension_dict.iteritems():
     constant_name = extension_name.upper() + '_FIELD_NUMBER'
     setattr(cls, constant_name, extension_field.number)
