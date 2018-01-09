@@ -160,8 +160,7 @@ def ParseMessage(descriptor, byte_str):
     Newly created protobuf Message object.
   """
 
-  class _ResultClass(message.Message):
-    __metaclass__ = GeneratedProtocolMessageType
+  class _ResultClass(message.Message, metaclass=GeneratedProtocolMessageType):
     DESCRIPTOR = descriptor
 
   new_msg = _ResultClass()

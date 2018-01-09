@@ -81,9 +81,9 @@ class MessageFactoryTest(unittest.TestCase):
     serialized = msg.SerializeToString()
     converted = factory_test2_pb2.Factory2Message.FromString(serialized)
     reserialized = converted.SerializeToString()
-    self.assertEquals(serialized, reserialized)
+    self.assertEqual(serialized, reserialized)
     result = cls.FromString(reserialized)
-    self.assertEquals(msg, result)
+    self.assertEqual(msg, result)
 
   def testGetPrototype(self):
     db = descriptor_database.DescriptorDatabase()
@@ -105,7 +105,7 @@ class MessageFactoryTest(unittest.TestCase):
     self.assertContainsSubset(
         ['net.proto2.python.internal.Factory2Message',
          'net.proto2.python.internal.Factory1Message'],
-        messages.keys())
+        list(messages.keys()))
     self._ExerciseDynamicClass(
         messages['net.proto2.python.internal.Factory2Message'])
 
