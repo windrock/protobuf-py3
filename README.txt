@@ -1,3 +1,19 @@
+Port of Google Protocol Buffers 2.x to Python3.  This is done by reorganizing
+the tree for easy, direct installation as a Python module and running the code
+through 2to3.
+
+Compared with the official Protocol Buffers releases, this offers Python 3
+support for 2.x versions (e.g., for use with Ubuntu LTS).
+
+Compared with https://github.com/GreatFruitOmsk/protobuf-py3, this stays closer
+to the upstream releases.
+
+Compared with https://github.com/opendoor-labs/protobuf-py3, this offers
+multiple versions.
+
+Original README
+===============
+
 Protocol Buffers - Google's data interchange format
 Copyright 2008 Google Inc.
 

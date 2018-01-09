@@ -28,10 +28,10 @@ maintainer_email = "protobuf@googlegroups.com"
 # Find the Protocol Compiler.
 if 'PROTOC' in os.environ and os.path.exists(os.environ['PROTOC']):
   protoc = os.environ['PROTOC']
-elif os.path.exists("../src/protoc"):
-  protoc = "../src/protoc"
-elif os.path.exists("../src/protoc.exe"):
-  protoc = "../src/protoc.exe"
+elif os.path.exists("protobuf/src/protoc"):
+  protoc = "protobuf/src/protoc"
+elif os.path.exists("protobuf/src/protoc.exe"):
+  protoc = "protobuf/src/protoc.exe"
 elif os.path.exists("../vsprojects/Debug/protoc.exe"):
   protoc = "../vsprojects/Debug/protoc.exe"
 elif os.path.exists("../vsprojects/Release/protoc.exe"):
@@ -44,7 +44,7 @@ def generate_proto(source):
   .proto file.  Does nothing if the output already exists and is newer than
   the input."""
 
-  output = source.replace(".proto", "_pb2.py").replace("../src/", "")
+  output = source.replace(".proto", "_pb2.py").replace("protobuf/src/", "")
 
   if (not os.path.exists(output) or
       (os.path.exists(source) and
@@ -57,21 +57,21 @@ def generate_proto(source):
 
     if protoc == None:
       sys.stderr.write(
-          "protoc is not installed nor found in ../src.  Please compile it "
+          "protoc is not installed nor found in protobuf/src.  Please compile it "
           "or install the binary package.\n")
       sys.exit(-1)
 
-    protoc_command = [ protoc, "-I../src", "-I.", "--python_out=.", source ]
+    protoc_command = [ protoc, "-Iprotobuf/src", "-I.", "--python_out=.", source ]
     if subprocess.call(protoc_command) != 0:
       sys.exit(-1)
 
 def GenerateUnittestProtos():
-  generate_proto("../src/google/protobuf/unittest.proto")
-  generate_proto("../src/google/protobuf/unittest_custom_options.proto")
-  generate_proto("../src/google/protobuf/unittest_import.proto")
-  generate_proto("../src/google/protobuf/unittest_import_public.proto")
-  generate_proto("../src/google/protobuf/unittest_mset.proto")
-  generate_proto("../src/google/protobuf/unittest_no_generic_services.proto")
+  generate_proto("protobuf/src/google/protobuf/unittest.proto")
+  generate_proto("protobuf/src/google/protobuf/unittest_custom_options.proto")
+  generate_proto("protobuf/src/google/protobuf/unittest_import.proto")
+  generate_proto("protobuf/src/google/protobuf/unittest_import_public.proto")
+  generate_proto("protobuf/src/google/protobuf/unittest_mset.proto")
+  generate_proto("protobuf/src/google/protobuf/unittest_no_generic_services.proto")
   generate_proto("google/protobuf/internal/test_bad_identifiers.proto")
   generate_proto("google/protobuf/internal/more_extensions.proto")
   generate_proto("google/protobuf/internal/more_extensions_dynamic.proto")
@@ -132,8 +132,8 @@ class clean(_clean):
 class build_py(_build_py):
   def run(self):
     # Generate necessary .proto file if it doesn't exist.
-    generate_proto("../src/google/protobuf/descriptor.proto")
-    generate_proto("../src/google/protobuf/compiler/plugin.proto")
+    generate_proto("protobuf/src/google/protobuf/descriptor.proto")
+    generate_proto("protobuf/src/google/protobuf/compiler/plugin.proto")
 
     GenerateUnittestProtos()
     # Make sure google.protobuf.compiler is a valid package.
@@ -155,7 +155,7 @@ if __name__ == '__main__':
         include_dirs = [ "." ],
         libraries = [ "protobuf" ]))
 
-  setup(name = 'protobuf',
+  setup(name = 'protobuf-py3',
         version = '2.5.0',
         packages = [ 'google' ],
         namespace_packages = [ 'google' ],
